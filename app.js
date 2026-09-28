@@ -7,7 +7,7 @@ if (process.env.NODE_ENV != "production") {
 const mongoose = require('mongoose');
 const port = process.env.PORT || 3000;
 const path = require('path');
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.ATLASDB_URL;
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError.js");
@@ -15,15 +15,28 @@ const listingRoutes = require("./routes/listing.js");
 const reviewRoutes = require("./routes/review.js");
 const userRoutes = require("./routes/user.js");
 const session = require("express-session");
+const { MongoStore } = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
 
-// Middleware
+const store = MongoStore.create({
+    mongoUrl: MONGO_URI,
+    crypto: {
+        secret: process.env.SECRET,
+    },
+    touchAfter: 24 * 3600
+});
+
+store.on("error", () => {
+    console.log("Error in MONGO SESSION STORE", err);
+});
+
 const sessionOptions = {
-    secret: "mysupersecretcode",
+    store,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
