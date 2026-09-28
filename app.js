@@ -52,9 +52,9 @@ async function main() {
 }
 
 // Routes
-app.get('/', (req, res) => {
-    res.send("Root route is working!");
-});
+// app.get('/', (req, res) => {
+//     res.send("Root route is working!");
+// });
 
 app.use(session(sessionOptions));
 app.use(flash());
